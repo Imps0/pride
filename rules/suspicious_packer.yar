@@ -1,13 +1,13 @@
-rule Suspicious_Packer
-{
-    meta:
-        description = "Detecta executáveis compactados com UPX/MPRESS"
-        author = "Porão"
-
-    strings:
-        $p1 = "UPX!"
-        $p2 = "MPRESS1"
-
-    condition:
-        any of ($p*)
+rule Suspicious_Packer {
+  meta:
+    author = "audit"
+    date = "2025-09-10"
+    description = "Detect common packer signatures (UPX, etc.) - may indicate obfuscated malware"
+  strings:
+    $upx1 = "UPX!" ascii
+    $upx2 = "UPX0" ascii
+    $themida = "Themida" ascii
+    $aspack = "ASPack" ascii
+  condition:
+    any of ($upx1, $upx2, $themida, $aspack)
 }

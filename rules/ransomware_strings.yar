@@ -1,16 +1,15 @@
-rule Ransomware_Generic_Strings
-{
-    meta:
-        description = "Strings comuns em ransomwares"
-        author = "Porão"
-
-    strings:
-        $a1 = "Bitcoin" nocase
-        $a2 = "RSA-2048"
-        $a3 = "AES-256"
-        $a4 = "All your files"
-        $a5 = "Encrypted files"
-
-    condition:
-        2 of ($a*)
+rule Ransomware_Notes_Keywords {
+  meta:
+    author = "audit"
+    date = "2025-09-10"
+    description = "Detect common ransomware note / keywords"
+  strings:
+    $a = "decrypt" nocase
+    $b = "restore" nocase
+    $c = "recover" nocase
+    $d = "contact" nocase
+    $e = "readme" nocase
+    $f = "how to restore" nocase
+  condition:
+    3 of them
 }
