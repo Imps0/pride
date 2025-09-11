@@ -44,13 +44,19 @@ Ela combina **Machine Learning**, **regras YARA**, **consultas a banco externo (
 - Download: [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)  
 - Durante a instalação marque **“Add Python to PATH”**
 
+
+
 ### 2. Dependências Python
 Na raiz do projeto existe o arquivo `requirements.txt`.  
 Para instalar tudo de uma vez (abra PowerShell **como Administrador**):
 
 powershell
-cd "C:\Users\seuuser\Desktop\pride"
+cd "C:\Users\seuuser\Downloads\pride"
 pip install -r requirements.txt
+
+Set-ExecutionPolicy RemoteSigned -Scope Process -Force
+.\setup-sysmon.ps1
+
 Execute:
 python porao.py
 

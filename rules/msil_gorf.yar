@@ -27,6 +27,6 @@ rule MSIL_Gorf_family
 
   condition:
     // regra heurística: arquivo .NET (mscorlib ou System.IO) + ao menos 2 indicadores de criptografia/IO ou nota/extensão
-    (any of ($mscorlib, $system_io)) and ( 2 of ($crypto_ns, $aes, $rijndael, $encrypt_method, $writeallbytes, $directory_getfiles, $file_move, $rnote, $extwn) )
+    (any of ($mscorlib, $system_io)) and ( 2 of ($crypto_ns, $aes, $rijndael, $encrypt_method, $writeallbytes, $directory_getfiles, $file_move, $vssadm, $rnote, $extwn) )
     or any of ($confuser, $dotf)
 }
