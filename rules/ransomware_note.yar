@@ -2,7 +2,7 @@ rule Ransomware_Note
 {
     meta:
         description = "Detecta notas de resgate comuns de ransomwares"
-        author = "Porão"
+        author = "imps"
         reference = "on_created -> busca por decrypt/restore/recover"
 
     strings:

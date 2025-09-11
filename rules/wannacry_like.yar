@@ -1,6 +1,6 @@
 rule Wannacry_like {
   meta:
-    author = "audit"
+    author = "imps"
     date = "2025-09-10"
     description = "Detect strings and ransom-note patterns related to WannaCry-like samples"
   strings:

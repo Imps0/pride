@@ -1,6 +1,6 @@
 rule Suspicious_Packer {
   meta:
-    author = "audit"
+    author = "imps"
     date = "2025-09-10"
     description = "Detect common packer signatures (UPX, etc.) - may indicate obfuscated malware"
   strings:

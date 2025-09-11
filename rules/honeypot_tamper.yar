@@ -1,6 +1,6 @@
 rule Honeypot_Tamper {
   meta:
-    author = "audit"
+    author = "imps"
     date = "2025-09-10"
     description = "Detect tampering of the honeypot files created by the tool"
   strings:

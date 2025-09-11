@@ -39,19 +39,18 @@ Ela combina **Machine Learning**, **regras YARA**, **consultas a banco externo (
 ## 📋 Pré-requisitos
 
 ### 1. Python
-- Windows 10 ou 11.  
-- Python **3.8 até 3.11** (Python 3.12+ pode causar problemas de compatibilidade).  
-- Baixar em: [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)  
-- Marque a opção **“Add Python to PATH”** na instalação.
+- Windows 10 ou 11  
+- Python **3.8 até 3.11** (Python 3.12+ pode causar problemas de compatibilidade)  
+- Download: [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)  
+- Durante a instalação marque **“Add Python to PATH”**
 
 ### 2. Dependências Python
 Na raiz do projeto existe o arquivo `requirements.txt`.  
-Instale tudo de uma vez (abra PowerShell **como Administrador**):
+Para instalar tudo de uma vez (abra PowerShell **como Administrador**):
 
 powershell
 cd "C:\Users\seuuser\Desktop\pride"
 pip install -r requirements.txt
-
 Execute:
 python porao.py
 

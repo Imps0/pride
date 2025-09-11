@@ -1,6 +1,6 @@
 rule Ransomware_Notes_Keywords {
   meta:
-    author = "audit"
+    author = "imps"
     date = "2025-09-10"
     description = "Detect common ransomware note / keywords"
   strings:

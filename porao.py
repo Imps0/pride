@@ -1,6 +1,8 @@
 # porao.py (versão melhorada)
 from comportamento import avaliar
-from detector import DetectorMalware
+from detector import DetectorMalware, detect_and_respond_msil, check_vigorf
+import win32evtlog
+import win32evtlogutil
 import os
 import pathlib
 import psutil
@@ -34,6 +36,71 @@ WHITELIST_PROCS = {"OneDrive.exe", "Dropbox.exe", "GoogleDriveFS.exe", "GoogleDr
 
 protected_backup = f"C:\\Users\\{username}\\Downloads\\protected_backup"
 quarantine_dir = os.path.join(protected_backup, "quarantine")
+
+import threading
+
+def monitor_sysmon():
+    """
+    Monitora eventos do Sysmon (Event Viewer) e reage a comandos suspeitos.
+    """
+    server = "localhost"
+    log_type = "Microsoft-Windows-Sysmon/Operational"
+
+    try:
+        hand = win32evtlog.OpenEventLog(server, log_type)
+    except Exception as e:
+        print(f"[Sysmon] Falha ao abrir log: {e}")
+        return
+
+    flags = win32evtlog.EVENTLOG_FORWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
+    offset = 0
+
+    print("[Sysmon] Monitorando eventos em tempo real...")
+
+    while True:
+        events = win32evtlog.ReadEventLog(hand, flags, offset)
+        if not events:
+            time.sleep(2)
+            continue
+
+        for event in events:
+            try:
+                if not event.StringInserts:
+                    continue
+
+                message = " ".join(str(s) for s in event.StringInserts if s)
+
+                # Comandos perigosos típicos de ransomware
+                alert_patterns = [
+                    "vssadmin delete shadows",
+                    "wbadmin delete",
+                    "bcdedit",
+                    "wmic shadowcopy",
+                    "powershell -enc",
+                    "powershell -encodedcommand",
+                ]
+
+                if any(pat.lower() in message.lower() for pat in alert_patterns):
+                    print(f"[Sysmon ALERTA] Comando suspeito detectado: {message}")
+
+                    # Se possível, encerrar processo suspeito
+                    pid = None
+                    try:
+                        # Alguns eventos trazem PID no StringInserts
+                        for s in event.StringInserts:
+                            if s and s.isdigit():
+                                pid = int(s)
+                                break
+                    except:
+                        pass
+
+                    if pid:
+                        encerrar_proctree(pid)
+                        print(f"[Sysmon] Processo {pid} encerrado.")
+                    else:
+                        print("[Sysmon] Não foi possível identificar o PID.")
+            except Exception as e:
+                print(f"[Sysmon erro] {e}")
 
 def encerrar_proctree():
     global ult_processos
@@ -254,12 +321,25 @@ class MonitorFolder(FileSystemEventHandler):
     def on_modified(self, event):
         global change_type
         change_type[1] += 1
-        event_timestamps.append(time.time())
+
         if extrair_extensao(event.src_path):
+            # Primeiro, rodamos o detector original (YARA + MalwareBazaar)
             try:
                 DetectorMalware(event.src_path)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[DetectorMalware erro] {e}")
+
+            # Detector heurístico MSIL/Gorf
+            try:
+                detect_and_respond_msil(event.src_path)
+            except Exception as e:
+                print(f"[MSIL/Gorf erro] {e}")
+
+            # Detector heurístico Trojan:Win32/Vigorf.A
+            try:
+                check_vigorf(event.src_path)
+            except Exception as e:
+                print(f"[Vigorf.A erro] {e}")
 
     def on_moved(self, event):
         global change_type
@@ -268,7 +348,7 @@ class MonitorFolder(FileSystemEventHandler):
 if __name__ == "__main__":
     # registra para iniciar com o windows (apenas se executado como admin)
     try:
-        registry.AdicionarRegistro(script=os.path.realpath(__file__), name='PoraoRansomwareDetect')
+        registry.AdicionarRegistro(script=os.path.realpath(__file__), name="PoraoRansomwareDetect")
     except Exception:
         pass
     start_protection()
@@ -281,6 +361,7 @@ if __name__ == "__main__":
     observer = Observer()
     observer.schedule(event_handler, path=src_path, recursive=True)
     observer.start()
+    threading.Thread(target=monitor_sysmon, daemon=True).start()
     try:
         while True:
             try:
